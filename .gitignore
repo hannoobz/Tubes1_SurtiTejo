@@ -161,3 +161,21 @@ cython_debug/
 
 # vscode stuff
 .vscode/
+
+# Engine stuff
+.husky/
+.yarn/
+node_modules/
+packages/
+scripts/
+.dockerignore
+.editorconfig
+.nvmrc
+.yarnrc.yml
+commitlint.config.js
+docker-compose.*
+*.sh
+LICENSE
+*.json
+RULES.md
+yarn.lock
