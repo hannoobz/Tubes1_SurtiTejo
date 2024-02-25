@@ -1,14 +1,75 @@
-
 import random
 from typing import Optional
 
 from game.logic.base import BaseLogic
 from game.models import GameObject, Board, Position
 from ..util import get_direction
+from typing import Tuple
 
-class MainBot:
+
+class MainBot(BaseLogic):
     def __init__(self):
         self.directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]
         self.goal_position: Optional[Position] = None
-        self.current_direction = 0
-        self.diamond_position = []
+        self.prev_position = (None,None)
+        self.diamonds :Optional[list[GameObject]] = None
+        self.target_positon : Optional[Position] = None
+        self.go_back = 1
+        self.inventory_space_left = 0
+        
+    
+    def next_move(self, board_bot: GameObject, board: Board):
+        props = board_bot.properties
+        self.diamonds = board.diamonds
+        curr_position = board_bot.position
+        if props.diamonds == 5:
+            self.target_positon = props.base
+        else :
+            if (not self.target_positon or (self.target_positon == curr_position) or (self.target_positon == props.base)):
+                self.inventory_space_left = board_bot.properties.inventory_size -  board_bot.properties.diamonds
+                self.target_positon = self.findClosestDiamond(curr_position,board)
+                if (self.target_positon.x == 0 and self.target_positon.y == 0 ):
+                    self.target_positon = props.base
+        
+        
+        if self.target_positon:
+            delta_x , delta_y = get_direction(
+                curr_position.x,
+                curr_position.y,
+                self.target_positon.x,
+                self.target_positon.y
+            )
+            if (curr_position.x == self.prev_position[0] and curr_position.y == self.prev_position[1]):
+                if (delta_x != 0):
+                    delta_y = delta_x*self.go_back
+                    delta_x = 0
+                elif (delta_y != 0) :
+                    delta_x = delta_x * self.go_back
+                    delta_y = 0
+                    self.go_back *= -1
+                self.prev_position  = (curr_position.x,curr_position.y)
+            return delta_x,delta_y
+        return 0,0
+        
+    def findFirstDiamond(self):
+        return self.diamonds[0].position
+
+    def findClosestDiamond(self, current_position: Position, board: Board) -> Position:
+        best_position = 0,0 # It's assumed to be a tuple, but should ideally be a Position object
+        best_distance = float('inf')  # Use float('inf') for initial comparison to simplify logic
+
+        for diamond in self.diamonds:
+            if (self.inventory_space_left == 1 and diamond.properties.points == 2):
+                pass
+            else :
+                distance = MainBot.calculate_distance(current_position, diamond.position)
+                if distance < best_distance:
+                    best_distance = distance
+                    best_position = diamond.position
+
+        return best_position
+            
+    @staticmethod
+    def calculate_distance(point_a : Position, point_b : Position):
+        return ((point_a.x - point_b.x)** 2 + (point_a.y - point_b.y) ** 2)** 0.5
+
