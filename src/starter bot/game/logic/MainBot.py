@@ -19,12 +19,19 @@ class MainBot(BaseLogic):
     
     def next_move(self, board_bot: GameObject, board: Board):
         props = board_bot.properties
-        self.diamonds = board.diamonds
+        diamond_locations = board.diamonds
+        if (not self.diamonds):
+            self.diamonds = diamond_locations
+            
+        elif (self.diamonds != diamond_locations):
+            self.diamonds = diamond_locations
+   
         curr_position = board_bot.position
+
         if props.diamonds == 5:
             self.target_positon = props.base
         else :
-            if (not self.target_positon or (self.target_positon == curr_position) or (self.target_positon == props.base)):
+            if (not self.target_positon or (self.target_positon.x == curr_position.x and self.target_positon.y == curr_position.y)):
                 self.inventory_space_left = board_bot.properties.inventory_size -  board_bot.properties.diamonds
                 self.target_positon = self.findClosestDiamond(curr_position,board)
                 if (self.target_positon.x == 0 and self.target_positon.y == 0 ):
@@ -70,5 +77,6 @@ class MainBot(BaseLogic):
             
     @staticmethod
     def calculate_distance(point_a : Position, point_b : Position):
-        return ((point_a.x - point_b.x)** 2 + (point_a.y - point_b.y) ** 2)** 0.5
+        #using manhattan distance for grid map
+        return abs(point_b.x - point_a.x) + abs(point_b.y - point_a.y)
 
