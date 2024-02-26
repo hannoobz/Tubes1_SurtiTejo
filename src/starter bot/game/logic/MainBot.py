@@ -1,10 +1,7 @@
 from typing import List, Optional, Union
-
 from game.logic.base import BaseLogic
 from game.models import GameObject, Board, Position
 from ..util import get_direction
-
-
 
 class MainBot(BaseLogic):
     def __init__(self):
@@ -17,9 +14,6 @@ class MainBot(BaseLogic):
         self.ownBot = None
         self.go_back = 1
         self.inventory_space_left = 0
-        
-    
-
 
     @staticmethod
     # using manhattan distance for grid like maps
@@ -51,12 +45,7 @@ class MainBot(BaseLogic):
                 if (distance < min_red_distance) :
                     min_red_distance = distance
                     closest_red_diamond = diamond
-        return  closest_blue_diamond,closest_red_diamond
-
-
-
-            
-
+        return  closest_blue_diamond,closest_red_diamond    
 
     def next_move(self, board_bot: GameObject, board: Board):
         props = board_bot.properties
@@ -73,7 +62,6 @@ class MainBot(BaseLogic):
         closest_red_diamond = allDiamonds[1]
         allButtons = [d for d in board.game_objects if d.type == "DiamondButtonGameObject"]
         allbase = [d for d in board.game_objects if d.type == "BaseGameObject"]
-
 
         # decision making
         if props.diamonds == 5 or (props.diamonds >=3 and MainBot.calculate_distance(curr_position,props.base) >= 0.5*(board.width + board.height)) :
@@ -110,34 +98,13 @@ class MainBot(BaseLogic):
             if (curr_position.x == self.prev_position[0] and curr_position.y == self.prev_position[1]):
                 if (delta_x != 0):
                     delta_y = delta_x*self.go_back
-
                     delta_x = 0
                 elif (delta_y != 0) :
                     delta_x = delta_x * self.go_back
                     delta_y = 0
                 self.go_back *= -1
-
             self.prev_position  = (curr_position.x,curr_position.y)
             return delta_x,delta_y
         
         return 0,0
         
-    # def findFirstDiamond(self):
-    #     return self.diamonds[0].position
-
-    # def findClosestDiamond(self, current_position: Position, board: Board) -> Position:
-    #     best_position = 0,0 # It's assumed to be a tuple, but should ideally be a Position object
-    #     best_distance = float('inf')  # Use float('inf') for initial comparison to simplify logic
-
-    #     for diamond in self.diamonds:
-    #         if (self.inventory_space_left == 1 and diamond.properties.points == 2):
-    #             pass
-    #         else :
-    #             distance = MainBot.calculate_distance(current_position, diamond.position)
-    #             if distance < best_distance:
-    #                 best_distance = distance
-    #                 best_position = diamond.position
-
-    #     return best_position
-            
-
