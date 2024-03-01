@@ -178,3 +178,4 @@ LICENSE
 *.json
 RULES.md
 yarn.lock
+.DS_Store
