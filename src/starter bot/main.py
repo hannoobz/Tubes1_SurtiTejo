@@ -12,7 +12,7 @@ from game.logic.MainBot import MainBot
 from game.logic.OldBot import OldBot
 
 init()
-BASE_URL = "http://localhost:3000/api"
+BASE_URL = "http://192.168.233.134:8082/api"
 DEFAULT_BOARD_ID = 1
 CONTROLLERS = {
     "Random": RandomLogic,
@@ -207,7 +207,7 @@ while True:
 
     # Don't spam the board more than it allows!
     # sleep(move_delay * time_factor)
-    sleep(1)
+    sleep(0.3)
 
 
 ###############################################################################

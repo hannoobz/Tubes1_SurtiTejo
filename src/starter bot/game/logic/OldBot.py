@@ -3,8 +3,6 @@ from game.logic.base import BaseLogic
 from game.models import GameObject, Board, Position
 import random
 
-
-
 def clamp(n, smallest, largest):
     return max(smallest, min(n, largest))
 
@@ -78,8 +76,9 @@ class OldBot(BaseLogic):
     
     def objectInMap(self, listObject : List[GameObject]):
         for obj in listObject:
-            if (obj.position.x == self.target_position.x and obj.position.y == self.target_position.y):
-                return True
+            if (obj):
+                if (obj.position.x == self.target_position.x and obj.position.y == self.target_position.y):
+                    return True
         return False
     
     @staticmethod
@@ -152,7 +151,7 @@ class OldBot(BaseLogic):
                 else:
                     # make decision making
                     self.findNearestDiamond(closest_blue_diamond , closest_red_diamond, board_bot, board)
-            elif (self.target_position != base) :
+            elif (self.target_position.x != base.x and self.target_position.y != base.y and self.target_position) :
                 if (self.target_object.type == "DiamondGameObject"):
                     if (not self.objectInMap([closest_blue_diamond,closest_red_diamond])):
                         self.target_position = None

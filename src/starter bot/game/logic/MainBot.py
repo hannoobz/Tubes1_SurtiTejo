@@ -3,14 +3,14 @@ from game.logic.base import BaseLogic
 from game.models import GameObject, Board, Position
 import random
 
-
-
+# Utilities
 def clamp(n, smallest, largest):
     return max(smallest, min(n, largest))
 
 def position_equals(a: Position, b: Position):
     return a.x == b.x and a.y == b.y
 
+# Main Class, greedy logic
 class MainBot(BaseLogic):
     
     # Initialize
@@ -37,86 +37,8 @@ class MainBot(BaseLogic):
         self.ExitPortal : Optional[GameObject] = None
         self.TimeLeft = None
 
-
-
-    #Algorithms
-    def findNearestDiamond(self, closest_blue_diamond , closest_red_diamond, board_bot, board):
-        closest_diamond = None  
-        props = board_bot.properties
-        base = board_bot.properties.base
-        curr_position = board_bot.position
-        
-                    
-                    # mencari optimal jia kedua ada
-        if closest_blue_diamond and (not closest_red_diamond or MainBot.calculate_distance(closest_blue_diamond.position, curr_position) < MainBot.calculate_distance(closest_red_diamond.position, curr_position) * 0.75):
-            closest_diamond = closest_blue_diamond
-        elif closest_red_diamond and props.inventory_size - props.diamonds > 1:
-            closest_diamond = closest_red_diamond
-                    
-                    # update jika tidak ada diamond
-        self.target_position = closest_diamond.position if closest_diamond else base
-        self.target_object = closest_diamond if closest_diamond else base
-
-                # Lebih baik balik ke base atau tidak
-        if props.diamonds >= 4 and MainBot.calculate_distance(self.target_position, base) >= 0.5 * (board.width + board.height):
-            self.target_position = base
-            self.target_object = None
-
-    def make_decision(self):
-                # for now, aim for closest diamond
-        curr_position = self.ownBot.position
-        props = self.ownBot.properties
-        base = props.base
-
-        closest_enemy = None
-        closest_enemy_distance = None
-
-        # if (self.AllEnemies is not None) and (self.AllEnemies  != []):
-        #     closest_enemy = min(self.AllEnemies,key = lambda x : self.calculate_distance(x.position,curr_position), default="EMPTY")
-        #     closest_enemy_distance = self.calculate_distance(closest_enemy.position,curr_position)
-
-        # if (closest_enemy is not None and (closest_enemy_distance  <= 1 and closest_enemy.properties.diamonds >= 3)):
-        #     self.target_position = closest_enemy.position
-        #     self.target_object = closest_enemy
-
-        # else :
-        if props.diamonds == 5 or (props.diamonds >=4 and MainBot.calculate_distance(curr_position,props.base) >= 0.5*(self.board.width + self.board.height)) or (props.diamonds >= 3 and self.TimeLeft <= 15000) or (props.diamonds >= 2 and self.TimeLeft <= 10000) :
-            # Move to base if inventory is full
-            self.target_position = base
-        else:
-            if (not self.ExitPortal) or (curr_position.x == self.target_position.x and curr_position.y == self.target_position.y) :
-                if (self.DiamondAfterPortal):
-                    self.target_position = self.DiamondAfterPortal.position
-                    self.target_object = self.DiamondAfterPortal
-                    self.DiamondAfterPortal = None
-                    self.EnterPortal = None
-                    self.ExitPortal = None
-                else :
-                    self.initializeState()
-                    curr_position = self.ownBot.position
-                    props = self.ownBot.properties
-                    base = props.base
-                    allDiamonds = self.sortDiamonds(self.AllDiamonds,curr_position)
-                    if not allDiamonds :
-                        self.target_position = self.ownBot.properties.base
-
-                    else:
-                        closest_blue_diamond = allDiamonds[0]
-                        closest_red_diamond = allDiamonds[1]
-                        self.findNearestDiamond(closest_blue_diamond,closest_red_diamond,self.ownBot,self.board)
-
-            elif (self.ExitPortal):
-                print("HELLO")
-                if (self.ownBot.position.x == self.ExitPortal.position.x and self.ownBot.position.y == self.ExitPortal.position.y) or (self.ownBot.position.x == self.EnterPortal.position.x and self.ownBot.position.y == self.EnterPortal.position.y):
-                    self.target_position = self.DiamondAfterPortal.position
-                    self.target_object = self.DiamondAfterPortal
-                    self.DiamondAfterPortal = None
-                    self.EnterPortal = None
-                    self.ExitPortal = None
-
-        
     # getters
-    def get_direction(self,current_x, current_y, dest_x, dest_y,  width, height):
+    def get_direction(self,current_x, current_y, dest_x, dest_y):
         horizontal = random.randint(0,1)
         delta_x = clamp(dest_x - current_x, -1, 1)
         delta_y = clamp(dest_y - current_y, -1, 1)
@@ -143,15 +65,27 @@ class MainBot(BaseLogic):
             print("Target object")
             print(self.target_object)
             if (self.ownBot.position.x == self.target_position.x and self.ownBot.position.y == self.target_position.y):
+                print("In place")
+                print(self.DiamondAfterPortal)
                 if (self.DiamondAfterPortal):
+                    print("There is diamondafterportal")
                     self.target_position = self.DiamondAfterPortal.position
                     self.target_object = self.DiamondAfterPortal
                     self.DiamondAfterPortal = None
                     self.EnterPortal = None
                     self.ExitPortal = None
-                    return self.get_direction(self.ownBot.position.x,self.ownBot.position.y,self.target_position.x,self.target_position.y,self.board.width,self.board.height)
-                    
-            
+                    return self.get_direction(self.ownBot.position.x,self.ownBot.position.y,self.target_position.x,self.target_position.y)
+                else:
+                    self.DiamondAfterPortal = None
+                    self.EnterPortal = None
+                    self.ExitPortal = None
+                    AllDiamonds = self.sortDiamonds(self.AllDiamonds,self.ownBot.position,False)
+                    closest_diamond_blue = AllDiamonds[0]
+                    closest_red_diamond = AllDiamonds[1]
+                    self.findNearestDiamond(closest_diamond_blue,closest_red_diamond, self.ownBot,self.board)
+                    return self.get_direction(self.ownBot.position.x,self.ownBot.position.y, self.target_position.x,self.target_position.y)
+                
+
         return (delta_x, delta_y)
     
     def getTeleporters(self):
@@ -166,30 +100,103 @@ class MainBot(BaseLogic):
     def getEnemies(self):
         return [d for d in self.board.game_objects if d.type == "BaseGameObject" and d.id  != self.ownBot.id]
     
+
+    # Algorithm
+    def findNearestDiamond(self, closest_blue_diamond , closest_red_diamond, board_bot, board):
+        closest_diamond = None  
+        props = board_bot.properties
+        base = board_bot.properties.base
+        curr_position = board_bot.position
+                    # mencari optimal jia kedua ada
+        if closest_blue_diamond and closest_red_diamond:
+            if ( (0.5) ** self.calculate_distance(self.ownBot.position, closest_blue_diamond.position)  *(1) > (0.5)** self.calculate_distance(self.ownBot.position,closest_red_diamond.position)  * (2) ):  
+                closest_diamond  = closest_blue_diamond
+            else :
+                if props.inventory_size - props.diamonds > 1:
+                    closest_diamond  = closest_red_diamond
+                else :
+                    closest_diamond = closest_blue_diamond
+        elif closest_blue_diamond and not closest_red_diamond:
+            closest_diamond = closest_blue_diamond
+        elif closest_red_diamond and props.inventory_size - props.diamonds > 1:
+            closest_diamond = closest_red_diamond
+                    
+                    # update jika tidak ada diamond
+        self.target_position = closest_diamond.position if closest_diamond else base
+        self.target_object = closest_diamond if closest_diamond else base
+
+                # Lebih baik balik ke base atau tidak
+        if props.diamonds >= 4 and MainBot.calculate_distance(self.target_position, base) >= 0.5 * (board.width + board.height):
+            self.target_position = base
+            self.target_object = None
+            self.EnterPortal = None
+            self.ExitPortal = None
+            self.DiamondAfterPortal = None
+
+    def make_decision(self):
+                # for now, aim for closest diamond
+        curr_position = self.ownBot.position
+        props = self.ownBot.properties
+        base = props.base
+        closest_enemy = None
+        closest_enemy_distance = None
+        if props.diamonds == self.ownBot.properties.inventory_size or (props.diamonds >=4 and MainBot.calculate_distance(curr_position,props.base) >= 0.5*(self.board.width + self.board.height)) or (props.diamonds >= 3 and self.TimeLeft <= 15000) or (props.diamonds >= 2 and self.TimeLeft <= 12000) :
+            # Move to base if inventory is full
+            self.target_position = base
+        else:
+            if not (self.target_position) :
+                self.pickTarget(True)
+            elif (curr_position.x == self.target_position.x and curr_position.y == self.target_position.y):
+                self.pickTarget(True)
+            elif ( (abs(curr_position.x - self.prev_position[0]) + abs(curr_position.y - self.prev_position[1])  ) >= 3):
+                self.pickTarget(True)
+            else:
+                self.objectInMap()
+    
+    # pick path
+    def pickTarget(self, usePortal : bool):
+        self.initializeState()
+        curr_position = self.ownBot.position
+        props = self.ownBot.properties
+        allDiamonds = self.sortDiamonds(self.AllDiamonds,curr_position, usePortal)
+        if not allDiamonds :
+            self.target_position = props.base
+
+        else:
+            closest_blue_diamond = allDiamonds[0]
+            closest_red_diamond = allDiamonds[1]
+            self.findNearestDiamond(closest_blue_diamond,closest_red_diamond,self.ownBot,self.board)
+
     # Check if objecy is in map
     def objectInMap(self):
         listObject = []
         props = self.ownBot.properties
-        if (self.target_position.x != props.base.x and self.target_position.y != props.base.y) :
-            if (self.target_object.type == "DiamondGameObject"):
-                self.AllDiamonds = self.board.diamonds
-                allDiamonds = self.sortDiamonds(self.AllDiamonds,self.ownBot.position)
-                listObject = [allDiamonds[0],allDiamonds[1]]
+        if (self.target_position.x != props.base.x and self.target_position.y != props.base.y and self.target_object) :
+            if (self.target_object):
+                if (self.target_object.type == "DiamondGameObject"):
+                    self.AllDiamonds = self.board.diamonds
+                    allDiamonds = self.sortDiamonds(self.AllDiamonds,self.ownBot.position, True)
+                    listObject = [allDiamonds[0],allDiamonds[1]]
 
-            elif (self.target_object.type == "DiamondButtonGameObject"):
-                self.AllButtons = self.getButtons()
-                listObject = self.AllButtons
+                elif (self.target_object.type == "DiamondButtonGameObject"):
+                    self.AllButtons = self.getButtons()
+                    listObject = self.AllButtons
 
-            elif (self.target_object.type == "TeleportGameObject"):
-                self.AllPortal = self.getTeleporters()
-                listObject = self.AllPortal
-        if listObject :
-            for obj in listObject:
-                if obj != None:
-                    if (obj.position.x == self.target_position.x and obj.position.y == self.target_position.y):
-                        return
-            self.target_object = None
-            self.target_position = None
+                elif (self.target_object.type == "TeleportGameObject"):
+                    self.AllPortal = self.getTeleporters()
+                    listObject = self.AllPortal
+
+            if listObject :
+                for obj in listObject:
+                    if obj:
+                        if (obj.position.x == self.target_position.x and obj.position.y == self.target_position.y):
+                            return
+                        
+                self.target_object = None
+                self.target_position = None
+                self.EnterPortal = None
+                self.ExitPortal = None
+                self.DiamondAfterPortal = None   
         else :
             return
         
@@ -212,9 +219,7 @@ class MainBot(BaseLogic):
             elif (objects.type == "BaseGameObject"):
                 self.AllBase.append(objects)
 
-    
-    
-    def sortDiamonds(self,allDiamonds : List[GameObject], curr_position : Position):
+    def sortDiamonds(self,allDiamonds : List[GameObject], curr_position : Position, usePortal : bool):
         closest_blue_diamond = None
         closest_red_diamond = None
         min_blue_distance = float('inf')
@@ -235,7 +240,7 @@ class MainBot(BaseLogic):
                     self.ExitPortal = None
                     self.EnterPortal = None
 
-                if (distance_relative < min_blue_distance):
+                if (usePortal and distance_relative < min_blue_distance):
                     min_blue_distance = distance_relative
                     closest_blue_diamond = in_portal
                     self.DiamondAfterPortal = diamond
@@ -249,7 +254,7 @@ class MainBot(BaseLogic):
                     self.ExitPortal = None
                     self.EnterPortal = None
 
-                if (distance_relative < min_red_distance):
+                if (usePortal and distance_relative < min_red_distance):
                     min_red_distance = distance_relative
                     closest_red_diamond = in_portal
                     self.DiamondAfterPortal = diamond
@@ -264,13 +269,6 @@ class MainBot(BaseLogic):
         #using manhattan distance for grid map
         return abs(point_b.x - point_a.x) + abs(point_b.y - point_a.y)
     
-    @staticmethod
-    def thereIsObstacle(current_x, current_y, objects, delta_x, delta_y):
-        for i in objects:
-            if ((i.position.x == current_x + delta_x) and (i.position.y == current_y + delta_y)):
-                return True
-        return False
-        
     def next_move(self, board_bot: GameObject, board: Board):
         props = board_bot.properties
         curr_position = board_bot.position
@@ -284,10 +282,7 @@ class MainBot(BaseLogic):
                 curr_position.x,
                 curr_position.y,
                 self.target_position.x,
-                self.target_position.y,
-                # obstacles,
-                board.width,
-                board.height
+                self.target_position.y
             )
             if (curr_position.x == self.prev_position[0] and curr_position.y == self.prev_position[1]):
                 if (delta_x != 0):
@@ -298,6 +293,7 @@ class MainBot(BaseLogic):
                     delta_y = 0
                 self.go_back *= -1
             self.prev_position  = (curr_position.x,curr_position.y)
+
             return delta_x,delta_y
         
         return self.next_move(board_bot,board)
