@@ -32,6 +32,9 @@ class MainBot(BaseLogic):
         self.AllButtons : Optional[List[GameObject]] = None
         self.AllBase :  Optional[List[GameObject]] = None
         self.AllDiamonds :Optional[list[GameObject]] = None
+        self.DiamondAfterPortal : Optional[GameObject] = None
+        self.EnterPortal : Optional[GameObject] = None
+        self.ExitPortal : Optional[GameObject] = None
         self.TimeLeft = None
 
 
@@ -64,7 +67,7 @@ class MainBot(BaseLogic):
         curr_position = self.ownBot.position
         props = self.ownBot.properties
         base = props.base
-        self.initializeState()
+
         closest_enemy = None
         closest_enemy_distance = None
 
@@ -81,15 +84,37 @@ class MainBot(BaseLogic):
             # Move to base if inventory is full
             self.target_position = base
         else:
-            allDiamonds = self.sortDiamonds(self.AllDiamonds,curr_position)
-            if not allDiamonds :
-                self.target_position = self.ownBot.properties.base
-            else:
-                closest_blue_diamond = allDiamonds[0]
-                closest_red_diamond = allDiamonds[1]
-                self.findNearestDiamond(closest_blue_diamond,closest_red_diamond,self.ownBot,self.board)
+            if (not self.ExitPortal) or (curr_position.x == self.target_position.x and curr_position.y == self.target_position.y) :
+                if (self.DiamondAfterPortal):
+                    self.target_position = self.DiamondAfterPortal.position
+                    self.target_object = self.DiamondAfterPortal
+                    self.DiamondAfterPortal = None
+                    self.EnterPortal = None
+                    self.ExitPortal = None
+                else :
+                    self.initializeState()
+                    curr_position = self.ownBot.position
+                    props = self.ownBot.properties
+                    base = props.base
+                    allDiamonds = self.sortDiamonds(self.AllDiamonds,curr_position)
+                    if not allDiamonds :
+                        self.target_position = self.ownBot.properties.base
 
-    
+                    else:
+                        closest_blue_diamond = allDiamonds[0]
+                        closest_red_diamond = allDiamonds[1]
+                        self.findNearestDiamond(closest_blue_diamond,closest_red_diamond,self.ownBot,self.board)
+
+            elif (self.ExitPortal):
+                print("HELLO")
+                if (self.ownBot.position.x == self.ExitPortal.position.x and self.ownBot.position.y == self.ExitPortal.position.y) or (self.ownBot.position.x == self.EnterPortal.position.x and self.ownBot.position.y == self.EnterPortal.position.y):
+                    self.target_position = self.DiamondAfterPortal.position
+                    self.target_object = self.DiamondAfterPortal
+                    self.DiamondAfterPortal = None
+                    self.EnterPortal = None
+                    self.ExitPortal = None
+
+        
     # getters
     def get_direction(self,current_x, current_y, dest_x, dest_y,  width, height):
         horizontal = random.randint(0,1)
@@ -101,9 +126,32 @@ class MainBot(BaseLogic):
         else :
             if delta_y != 0:
                 delta_x = 0
+
         if (delta_x == 0 and delta_y == 0):
-            random_integer = random.randint(0, 3)
-            return self.directions[random_integer]
+            print("Target position : ")
+            print(self.target_position)
+            print()
+            print("Enter portal : ")
+            print(self.EnterPortal)
+            print()
+            print("exit portal : ")
+            print(self.ExitPortal)
+            print()
+            print("My position : ")
+            print(self.ownBot.position)
+            print()
+            print("Target object")
+            print(self.target_object)
+            if (self.ownBot.position.x == self.target_position.x and self.ownBot.position.y == self.target_position.y):
+                if (self.DiamondAfterPortal):
+                    self.target_position = self.DiamondAfterPortal.position
+                    self.target_object = self.DiamondAfterPortal
+                    self.DiamondAfterPortal = None
+                    self.EnterPortal = None
+                    self.ExitPortal = None
+                    return self.get_direction(self.ownBot.position.x,self.ownBot.position.y,self.target_position.x,self.target_position.y,self.board.width,self.board.height)
+                    
+            
         return (delta_x, delta_y)
     
     def getTeleporters(self):
@@ -122,8 +170,6 @@ class MainBot(BaseLogic):
     def objectInMap(self):
         listObject = []
         props = self.ownBot.properties
-
-       
         if (self.target_position.x != props.base.x and self.target_position.y != props.base.y) :
             if (self.target_object.type == "DiamondGameObject"):
                 self.AllDiamonds = self.board.diamonds
@@ -185,16 +231,31 @@ class MainBot(BaseLogic):
                 if (distance < min_blue_distance):
                     min_blue_distance = distance
                     closest_blue_diamond = diamond
+                    self.DiamondAfterPortal = None
+                    self.ExitPortal = None
+                    self.EnterPortal = None
+
                 if (distance_relative < min_blue_distance):
                     min_blue_distance = distance_relative
                     closest_blue_diamond = in_portal
+                    self.DiamondAfterPortal = diamond
+                    self.EnterPortal = in_portal
+                    self.ExitPortal = out_portal
             else:
                 if (distance < min_red_distance) :
                     min_red_distance = distance
                     closest_red_diamond = diamond
+                    self.DiamondAfterPortal = None
+                    self.ExitPortal = None
+                    self.EnterPortal = None
+
                 if (distance_relative < min_red_distance):
                     min_red_distance = distance_relative
                     closest_red_diamond = in_portal
+                    self.DiamondAfterPortal = diamond
+                    self.EnterPortal = in_portal
+                    self.ExitPortal = out_portal
+
         return  closest_blue_diamond,closest_red_diamond
     
     # using manhattan distance for grid like maps    
