@@ -9,13 +9,15 @@ from game.logic.random import RandomLogic
 from game.util import *
 from game.logic.base import BaseLogic
 from game.logic.MainBot import MainBot
+from game.logic.OldBot import OldBot
 
 init()
 BASE_URL = "http://localhost:3000/api"
 DEFAULT_BOARD_ID = 1
 CONTROLLERS = {
     "Random": RandomLogic,
-    "MainBot" : MainBot
+    "MainBot" : MainBot,
+    "OldBot" : OldBot
 }
 
 ###############################################################################
