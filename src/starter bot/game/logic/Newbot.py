@@ -27,6 +27,10 @@ class Newbot(BaseLogic):
                     self.target_object = i
         return goal_position
     
+    def portalCheck(board,board_bot):
+        portals = [(item.position.x,item.position.y) for item in board.game_objects if item.type=="TeleportGameObject"]
+        return (board_bot.position.x,board_bot.position.y) in portals
+    
     def next_move(self, board_bot: GameObject, board: Board):
         if self.state==0:
             print("state find")
@@ -42,12 +46,16 @@ class Newbot(BaseLogic):
             return delta_x, delta_y
 
         elif self.state==1:
-            print("state chase")
             delta_x, delta_y = get_direction(
                 board_bot.position.x,
                 board_bot.position.y,
                 self.goal_position.x,
                 self.goal_position.y,)
+            
+            if (Newbot.portalCheck(board,board_bot)):
+                print("entering portal")
+                greedys = Newbot.greedy(self,board,board_bot)
+                delta_x, delta_y = get_direction(board_bot.position.x,board_bot.position.y,greedys.x,greedys.y)
             
             if(self.target_object not in board.diamonds):
                 print("Target Missing/Going to Base")
