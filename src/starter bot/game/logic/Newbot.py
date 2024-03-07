@@ -7,27 +7,31 @@ import threading
 
 class Newbot(BaseLogic):
     def __init__(self):
-        self.directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]
+        # self.directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]
         self.goal_position: Optional[Position] = None
         self.state = 0
+        self.target_object: Optional[GameObject] = None
 
     def calculate_distance(point_a : Position, point_b : Position):
         return abs(point_b.x - point_a.x) + abs(point_b.y - point_a.y)
     
-    def greedy(board,board_bot):
+    def greedy(self,board,board_bot):
         goal_position = board_bot.properties.base;
+        self.target_object = board_bot.properties.base;
         maxpoint = 0.001;
         for i in board.diamonds:
                 nextpoint = i.properties.points*(0.7)**Newbot.calculate_distance(board_bot.position,i.position)
                 if maxpoint<nextpoint and i.properties.points+board_bot.properties.diamonds<=board_bot.properties.inventory_size:
                     maxpoint = nextpoint
                     goal_position = i.position
+                    self.target_object = i
         return goal_position
     
     def next_move(self, board_bot: GameObject, board: Board):
         if self.state==0:
             print("state find")
-            greedys = Newbot.greedy(board,board_bot)
+            board_bot.properties.base
+            greedys = Newbot.greedy(self,board,board_bot)
             delta_x, delta_y = get_direction(
                 board_bot.position.x,
                 board_bot.position.y,
@@ -36,7 +40,6 @@ class Newbot(BaseLogic):
             self.goal_position = greedys
             self.state = 1;
             return delta_x, delta_y
-        
 
         elif self.state==1:
             print("state chase")
@@ -46,11 +49,16 @@ class Newbot(BaseLogic):
                 self.goal_position.x,
                 self.goal_position.y,)
             
+            if(self.target_object not in board.diamonds):
+                print("Target Missing/Going to Base")
+                greedys = Newbot.greedy(self,board,board_bot)
+                delta_x, delta_y = get_direction(board_bot.position.x,board_bot.position.y,greedys.x,greedys.y)
+
             if(board_bot.position.x+delta_x==self.goal_position.x and board_bot.position.y+delta_y==self.goal_position.y):
                 self.state=0
-                greedys = Newbot.greedy(board,board_bot)
+                greedys = Newbot.greedy(self,board,board_bot)
                 delta_x, delta_y = get_direction(board_bot.position.x,board_bot.position.y,greedys.x,greedys.y)
-            print("Target ", self.goal_position)
+            print("Target", self.goal_position)
             return delta_x, delta_y
 
         
