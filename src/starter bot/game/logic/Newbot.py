@@ -3,51 +3,74 @@ from typing import Optional
 from game.logic.base import BaseLogic
 from game.models import GameObject, Board, Position
 from ..util import get_direction
+import threading
 
 class Newbot(BaseLogic):
     def __init__(self):
         self.directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]
         self.goal_position: Optional[Position] = None
-        self.current_direction = 0
-        self.chase_mode = False
-        self.chosen: Optional[GameObject] = None
+        self.state = 0
 
+    def calculate_distance(point_a : Position, point_b : Position):
+        return abs(point_b.x - point_a.x) + abs(point_b.y - point_a.y)
+    
+    def greedy(board,board_bot):
+        goal_position = board_bot.properties.base;
+        maxpoint = 0.001;
+        for i in board.diamonds:
+                nextpoint = i.properties.points*(0.7)**Newbot.calculate_distance(board_bot.position,i.position)
+                if maxpoint<nextpoint and i.properties.points+board_bot.properties.diamonds<=board_bot.properties.inventory_size:
+                    maxpoint = nextpoint
+                    goal_position = i.position
+        return goal_position
+    
     def next_move(self, board_bot: GameObject, board: Board):
-        current_position = board_bot.position
-        base = board_bot.properties.base
-        props = board_bot.properties
-
-        if self.goal_position:
-            if (self.goal_position.x==current_position.x and self.goal_position.y==current_position.y):
-                self.goal_position=None;
-            try:
-                if(chosen not in board.diamonds):
-                    self.goal_position=None
-            except:
-                pass;
+        if self.state==0:
+            print("state find")
+            greedys = Newbot.greedy(board,board_bot)
+            delta_x, delta_y = get_direction(
+                board_bot.position.x,
+                board_bot.position.y,
+                greedys.x,
+                greedys.y)
+            self.goal_position = greedys
+            self.state = 1;
+            return delta_x, delta_y
         
-        if self.goal_position:
+
+        elif self.state==1:
+            print("state chase")
             delta_x, delta_y = get_direction(
-                current_position.x,
-                current_position.y,
+                board_bot.position.x,
+                board_bot.position.y,
                 self.goal_position.x,
-                self.goal_position.y,
-            )
-        else:
-            point = 0
-            nextpoint = 0;
-            self.goal_position = base;
-            for i in board.diamonds:
-                nextpoint = (0.5**(abs(((i.position.x)+(i.position.y))-((current_position.x)-(current_position.y)))))*i.properties.points;
-                print(point,nextpoint)
-                if(point<nextpoint and props.diamonds+i.properties.points<=5):
-                    point = nextpoint;
-                    self.goal_position = i.position;
-                    chosen = i;
-            delta_x, delta_y = get_direction(
-                current_position.x,
-                current_position.y,
-                self.goal_position.x,
-                self.goal_position.y,
-            )
-        return delta_x, delta_y
+                self.goal_position.y,)
+            
+            if(board_bot.position.x+delta_x==self.goal_position.x and board_bot.position.y+delta_y==self.goal_position.y):
+                self.state=0
+                greedys = Newbot.greedy(board,board_bot)
+                delta_x, delta_y = get_direction(board_bot.position.x,board_bot.position.y,greedys.x,greedys.y)
+            print("Target ", self.goal_position)
+            return delta_x, delta_y
+
+        
+        # if self.goal_position:
+
+        # else:
+        #     point = 0
+        #     nextpoint = 0;
+        #     self.goal_position = base;
+        #     for i in board.diamonds:
+        #         nextpoint = (0.5**(abs(((i.position.x)+(i.position.y))-((current_position.x)-(current_position.y)))))*i.properties.points;
+        #         print(point,nextpoint)
+        #         if(point<nextpoint and props.diamonds+i.properties.points<=5):
+        #             point = nextpoint;
+        #             self.goal_position = i.position;
+        #             chosen = i;
+        #     delta_x, delta_y = get_direction(
+        #         current_position.x,
+        #         current_position.y,
+        #         self.goal_position.x,
+        #         self.goal_position.y,
+        #     )
+        # return delta_x, delta_y

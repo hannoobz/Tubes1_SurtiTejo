@@ -11,7 +11,7 @@ from game.logic.base import BaseLogic
 from game.logic.MainBot import MainBot
 from game.logic.OldBot import OldBot
 from game.logic.OldBot2 import OldBot2
-from game.logic.OldBot3 import OldBot3
+from game.logic.Newbot import Newbot
 
 init()
 BASE_URL = "http://localhost:3000/api"
@@ -21,7 +21,7 @@ CONTROLLERS = {
     "MainBot" : MainBot,
     "OldBot" : OldBot,
     "OldBot2" :OldBot2,
-    "OldBot3" :OldBot3
+    "Newbot" :Newbot
 
 }
 
@@ -212,7 +212,7 @@ while True:
 
     # Don't spam the board more than it allows!
     # sleep(move_delay * time_factor)
-    sleep(0.3)
+    sleep(0.25)
 
 
 ###############################################################################
