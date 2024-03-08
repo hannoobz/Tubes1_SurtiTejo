@@ -1,5 +1,5 @@
 from typing import Optional
-
+import concurrent.futures
 from game.logic.base import BaseLogic
 from game.models import GameObject, Board, Position
 from ..util import get_direction
@@ -13,7 +13,7 @@ class Newbot(BaseLogic):
         return abs(point_b.x - point_a.x) + abs(point_b.y - point_a.y)
     
     def greedy(self,board,board_bot):
-        goal_position = board_bot.properties.base;
+        goal_position = board_bot.properties.base
         maxpoint = board_bot.properties.diamonds*(0.7)**Newbot.calculate_distance(board_bot.position,board_bot.properties.base);
         for i in board.diamonds:
                 nextpoint = i.properties.points*(0.8)**Newbot.calculate_distance(board_bot.position,i.position)
@@ -53,36 +53,43 @@ class Newbot(BaseLogic):
     
     def next_move(self, board_bot: GameObject, board: Board):
             # Get next move
-            greedyP,pPoint = Newbot.greedyPortal(self,board,board_bot)
-            greedyN,nPoint = Newbot.greedy(self,board,board_bot)
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                    
+                future_one = executor.submit(Newbot.greedyPortal, self, board, board_bot)
+                future_second = executor.submit(Newbot.greedy, self, board, board_bot)
+
+                result_one = future_one.result()
+                resutl_two = future_second.result()
+                
+                greedyP, pPoint = result_one
+                greedyN , nPoint = resutl_two
+                if (pPoint>nPoint):
+                    greedyS = greedyP
+                else:
+                    greedyS = greedyN
+
+                delta_x, delta_y = get_direction(
+                    board_bot.position.x,
+                    board_bot.position.y,
+                    greedyS.x,
+                    greedyS.y)
+                # Unstuck from base
+                try:
+                    if delta_x==0 and delta_y==0:
+                        print("UNSTUCK")
+                        delta_x,delta_y =  get_direction(
+                            board_bot.position.x,
+                            board_bot.position.y,
+                            board.diamonds[0].position.x,
+                            board.diamonds[0].position.y,
+                        )
+                except:
+                    pass
+                    
+                return delta_x, delta_y
+
+
             
-            if (pPoint>nPoint):
-                 greedyS = greedyP
-            else:
-                 greedyS = greedyN
-
-            delta_x, delta_y = get_direction(
-                board_bot.position.x,
-                board_bot.position.y,
-                greedyS.x,
-                greedyS.y)
-            # Unstuck from base
-            try:
-                if delta_x==0 and delta_y==0:
-                     print("UNSTUCK")
-                     delta_x,delta_y =  get_direction(
-                          board_bot.position.x,
-                          board_bot.position.y,
-                          board.diamonds[0].position.x,
-                          board.diamonds[0].position.y,
-                     )
-            except:
-                 pass
-                 
-            return delta_x, delta_y
-
-
-        
         # if self.goal_position:
 
         # else:
