@@ -18,7 +18,7 @@ class Newbot(BaseLogic):
     def greedy(self,board,board_bot):
         goal_position = board_bot.properties.base;
         self.target_object = board_bot.properties.base;
-        maxpoint = board_bot.properties.diamonds*(0.7)**Newbot.calculate_distance(board_bot.position,board_bot.properties.base);
+        maxpoint = board_bot.properties.diamonds*(0.65)**Newbot.calculate_distance(board_bot.position,board_bot.properties.base);
         for i in board.diamonds:
                 nextpoint = i.properties.points*(0.7)**Newbot.calculate_distance(board_bot.position,i.position)
                 if maxpoint<nextpoint and i.properties.points+board_bot.properties.diamonds<=board_bot.properties.inventory_size:
@@ -32,9 +32,6 @@ class Newbot(BaseLogic):
         return (board_bot.position.x,board_bot.position.y) in portals
     
     def next_move(self, board_bot: GameObject, board: Board):
-        
-        if self.state==0:
-            print("state find")
             greedys = Newbot.greedy(self,board,board_bot)
             delta_x, delta_y = get_direction(
                 board_bot.position.x,
@@ -42,32 +39,8 @@ class Newbot(BaseLogic):
                 greedys.x,
                 greedys.y)
             self.goal_position = greedys
-            self.state = 1;
             return delta_x, delta_y
 
-        elif self.state==1:
-            delta_x, delta_y = get_direction(
-                board_bot.position.x,
-                board_bot.position.y,
-                self.goal_position.x,
-                self.goal_position.y,)
-            
-            if (Newbot.portalCheck(board,board_bot)):
-                print("entering portal")
-                greedys = Newbot.greedy(self,board,board_bot)
-                delta_x, delta_y = get_direction(board_bot.position.x,board_bot.position.y,greedys.x,greedys.y)
-            
-            if(self.target_object not in board.diamonds):
-                print("Target Missing/Going to Base")
-                greedys = Newbot.greedy(self,board,board_bot)
-                delta_x, delta_y = get_direction(board_bot.position.x,board_bot.position.y,greedys.x,greedys.y)
-
-            if(board_bot.position.x+delta_x==self.goal_position.x and board_bot.position.y+delta_y==self.goal_position.y):
-                self.state=0
-                greedys = Newbot.greedy(self,board,board_bot)
-                delta_x, delta_y = get_direction(board_bot.position.x,board_bot.position.y,greedys.x,greedys.y)
-            print("Target", self.goal_position)
-            return delta_x, delta_y
 
         
         # if self.goal_position:
