@@ -1,7 +1,22 @@
+from random import randint
 import concurrent.futures
 from game.logic.base import BaseLogic
 from game.models import GameObject, Board, Position
-from ..util import get_direction
+
+def clamp(n, smallest, largest):
+    return max(smallest, min(n, largest))
+
+def get_direction(current_x, current_y, dest_x, dest_y):
+    horizontal = randint(0,1)
+    delta_x = clamp(dest_x - current_x, -1, 1)
+    delta_y = clamp(dest_y - current_y, -1, 1)
+    if horizontal:
+        if delta_x != 0:
+            delta_y = 0
+    else:
+        if delta_y != 0:
+            delta_x = 0
+    return (delta_x, delta_y)
 
 class Newbot(BaseLogic):
     def __init__(self):
