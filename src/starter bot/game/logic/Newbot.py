@@ -18,7 +18,7 @@ class Newbot(BaseLogic):
     def greedy(self,board,board_bot):
         goal_position = board_bot.properties.base;
         self.target_object = board_bot.properties.base;
-        maxpoint = 0.001;
+        maxpoint = board_bot.properties.diamonds*(0.7)**Newbot.calculate_distance(board_bot.position,board_bot.properties.base);
         for i in board.diamonds:
                 nextpoint = i.properties.points*(0.7)**Newbot.calculate_distance(board_bot.position,i.position)
                 if maxpoint<nextpoint and i.properties.points+board_bot.properties.diamonds<=board_bot.properties.inventory_size:
@@ -32,9 +32,9 @@ class Newbot(BaseLogic):
         return (board_bot.position.x,board_bot.position.y) in portals
     
     def next_move(self, board_bot: GameObject, board: Board):
+        
         if self.state==0:
             print("state find")
-            board_bot.properties.base
             greedys = Newbot.greedy(self,board,board_bot)
             delta_x, delta_y = get_direction(
                 board_bot.position.x,
