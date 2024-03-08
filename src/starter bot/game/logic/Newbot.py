@@ -27,7 +27,7 @@ class Newbot(BaseLogic):
         portal1_bot = Newbot.calculate_distance(portals[0],board_bot.position)
         portal2_bot = Newbot.calculate_distance(portals[1],board_bot.position)
 
-        if portal1_base>portal2_base:
+        if portal1_base<portal2_base:
              exitpoint = portals[1]
         else:
              exitpoint = portals[0]
