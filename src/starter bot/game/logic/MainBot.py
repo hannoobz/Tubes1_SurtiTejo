@@ -131,7 +131,7 @@ class MainBot(BaseLogic):
         base = board_bot.properties.base
                     # mencari optimal jia kedua ada
         if closest_blue_diamond and closest_red_diamond:
-            if ( (0.5) ** self.calculate_distance(self.ownBot.position, closest_blue_diamond.position)  *(1) > (0.5)** self.calculate_distance(self.ownBot.position,closest_red_diamond.position)  * (2) ):  
+            if ( (0.7) ** self.calculate_distance(self.ownBot.position, closest_blue_diamond.position)  * (1) > (0.7)** self.calculate_distance(self.ownBot.position,closest_red_diamond.position)  * (2) ):  
                 closest_diamond  = closest_blue_diamond
             else :
                 if props.inventory_size - props.diamonds > 1:
@@ -152,7 +152,7 @@ class MainBot(BaseLogic):
         self.target_object = closest_diamond if closest_diamond else None
 
                 # Lebih baik balik ke base atau tidak
-        if props.diamonds >= 4 and MainBot.calculate_distance(self.target_position, base) >= 0.5 * (board.width + board.height) and MainBot.calculate_distance(self.ownBot.position,self.target_position) >= 0.25 * (board.width + board.height):
+        if props.diamonds >= 3 and MainBot.calculate_distance(self.target_position, base) >= 0.5 * (board.width + board.height) and MainBot.calculate_distance(self.ownBot.position,self.target_position) >= 0.25 * (board.width + board.height):
             self.target_position = base
             self.target_object = None
             self.EnterPortal = None
@@ -340,7 +340,7 @@ class MainBot(BaseLogic):
                     except Exception as exc:
                         print(f'Generated an exception: {exc}')
         
-        print(distances_red)
+        # print(distances_red)
         return distances_blue, distances_blue_portal, distances_red, distances_red_protal
         
     def next_move(self, board_bot: GameObject, board: Board):
