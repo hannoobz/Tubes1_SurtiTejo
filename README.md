@@ -24,7 +24,7 @@
 ```
 ├─── doc
 │       ├─── Spesifikasi Tugas Besar 1 Stima 2023_2024.pdf
-│       └─── Tucil1-2024.pdf
+│       └─── SurtiTejo.pdf
 │   
 ├─── src
 │       └─── SurtiTejoBot.py
