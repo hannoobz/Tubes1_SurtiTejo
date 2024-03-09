@@ -11,7 +11,7 @@ from game.logic.base import BaseLogic
 from game.logic.MainBot import MainBot
 from game.logic.OldBot import OldBot
 from game.logic.OldBot2 import OldBot2
-from game.logic.Newbot import Newbot
+from game.logic.SurtiTejoBot import SurtiTejoBot
 from game.logic.BotWithTackle import BotWithTackle
 from game.logic.ChaseRed import ChaseRed
 
@@ -23,7 +23,7 @@ CONTROLLERS = {
     "MainBot" : MainBot,
     "OldBot" : OldBot,
     "OldBot2" :OldBot2,
-    "Newbot" :Newbot,
+    "SurtiTejoBot" :SurtiTejoBot,
     "BotWithTackle" : BotWithTackle,
     "ChaseRed" : ChaseRed
 }

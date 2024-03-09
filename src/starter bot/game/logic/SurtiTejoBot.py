@@ -18,7 +18,7 @@ def get_direction(current_x, current_y, dest_x, dest_y):
             delta_x = 0
     return (delta_x, delta_y)
 
-class Newbot(BaseLogic):
+class SurtiTejoBot(BaseLogic):
     def __init__(self):
         pass
 
@@ -27,9 +27,9 @@ class Newbot(BaseLogic):
 
     def greedy(self,board,board_bot):
         goal_position = board_bot.properties.base
-        maxpoint = board_bot.properties.diamonds*(0.7)**Newbot.calculate_distance(board_bot.position,board_bot.properties.base);
+        maxpoint = board_bot.properties.diamonds*(0.7)**SurtiTejoBot.calculate_distance(board_bot.position,board_bot.properties.base);
         for i in board.diamonds:
-                nextpoint = i.properties.points*(0.8)**Newbot.calculate_distance(board_bot.position,i.position)
+                nextpoint = i.properties.points*(0.8)**SurtiTejoBot.calculate_distance(board_bot.position,i.position)
                 if maxpoint<nextpoint and i.properties.points+board_bot.properties.diamonds<=board_bot.properties.inventory_size:
                     maxpoint = nextpoint
                     goal_position = i.position
@@ -37,10 +37,10 @@ class Newbot(BaseLogic):
 
     def greedyPortal(self,board,board_bot):
         portals = [item.position for item in board.game_objects if item.type=="TeleportGameObject"]
-        portal1_base = Newbot.calculate_distance(portals[0],board_bot.properties.base)
-        portal2_base = Newbot.calculate_distance(portals[1],board_bot.properties.base)
-        portal1_bot = Newbot.calculate_distance(portals[0],board_bot.position)
-        portal2_bot = Newbot.calculate_distance(portals[1],board_bot.position)
+        portal1_base = SurtiTejoBot.calculate_distance(portals[0],board_bot.properties.base)
+        portal2_base = SurtiTejoBot.calculate_distance(portals[1],board_bot.properties.base)
+        portal1_bot = SurtiTejoBot.calculate_distance(portals[0],board_bot.position)
+        portal2_bot = SurtiTejoBot.calculate_distance(portals[1],board_bot.position)
 
         if portal1_base<portal2_base:
              exitpoint = portals[1]
@@ -53,9 +53,9 @@ class Newbot(BaseLogic):
              entrypoint = portals[0]
 
         goal_position = entrypoint
-        maxpoint = board_bot.properties.diamonds*(0.69)**(Newbot.calculate_distance(board_bot.position,entrypoint)+Newbot.calculate_distance(exitpoint,board_bot.properties.base));
+        maxpoint = board_bot.properties.diamonds*(0.69)**(SurtiTejoBot.calculate_distance(board_bot.position,entrypoint)+SurtiTejoBot.calculate_distance(exitpoint,board_bot.properties.base));
         for i in board.diamonds:
-                nextpoint = i.properties.points*(0.79)**(Newbot.calculate_distance(board_bot.position,entrypoint)+Newbot.calculate_distance(exitpoint,i.position))
+                nextpoint = i.properties.points*(0.79)**(SurtiTejoBot.calculate_distance(board_bot.position,entrypoint)+SurtiTejoBot.calculate_distance(exitpoint,i.position))
                 if maxpoint<nextpoint and i.properties.points+board_bot.properties.diamonds<=board_bot.properties.inventory_size:
                     maxpoint = nextpoint
         return goal_position,maxpoint
@@ -64,8 +64,8 @@ class Newbot(BaseLogic):
             # Get next move
             with concurrent.futures.ThreadPoolExecutor() as executor:
 
-                future_one = executor.submit(Newbot.greedyPortal, self, board, board_bot)
-                future_second = executor.submit(Newbot.greedy, self, board, board_bot)
+                future_one = executor.submit(SurtiTejoBot.greedyPortal, self, board, board_bot)
+                future_second = executor.submit(SurtiTejoBot.greedy, self, board, board_bot)
 
                 result_one = future_one.result()
                 resutl_two = future_second.result()
