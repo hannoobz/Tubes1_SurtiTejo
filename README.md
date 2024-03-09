@@ -14,11 +14,25 @@
 
 ## Table of Contents
 * [General Info](#general-information)
+* [File Structure](#file-structure)
 * [Features](#features)
 * [Project Status](#project-status)
 * [Acknowledgements](#acknowledgements)
 * [Links](#links)
 
+## File Structure
+```
+├─── doc
+│       ├─── Spesifikasi Tugas Besar 1 Stima 2023_2024.pdf
+│       └─── Tucil1-2024.pdf
+│   
+├─── src
+│       └─── SurtiTejoBot.py
+│
+├─── .gitignore
+└─── README.md
+
+```
 
 ## General Information
 Dalam permainan _Diamonds_, tujuan utama dari bot adalah mendapatkan poin sebanyak-banyaknya dan mendapatkan poin lebih banyak dibandingkan dengan bot kompetitor lainnya. Untuk mencapai hal tersebut, terdapat beberapa alternatif aksi yang dapat dilakukan. Contohnya, bot dapat mengambil diamonds lalu menyimpannya di base. Dapat juga dengan melakukan tackle pada bot kompetitor yang sedang membawa banyak diamonds lalu menyimpannya di base. Bisa juga dengan menggunakan portal untuk mempersingkat jarak tempuh menuju diamonds ataupun base. Beberapa aksi tersebut dan komponen lain dapat dijadikan sebagai dasar pemetaan persoalan untuk mencapai tujuan dengan menggunakan algoritma _greedy_. Pada tugas besar pertama Strategi Algoritma, kami diminta untuk membuat sebuah bot dengan algoritma _greedy_ yang nantinya akan dipertandingkan satu sama lain.
@@ -30,6 +44,8 @@ Greedy bot in [_Diamonds_](https://github.com/Etimo/diamonds2/) game.
 
 ## Project Status
 Project is: _Finished_.
+- Bot Implementation
+- Video (Bonus)
 
 
 ## Acknowledgements
@@ -41,3 +57,4 @@ Project is: _Finished_.
 - [Tugas Besar 1 IF2211 Strategi Algoritma](https://docs.google.com/document/d/13cbmMVXviyu8eKQ6heqgDzt4JNNMeAZO/edit).
 - [This Repository](https://github.com/hannoobz/Tubes1_SurtiTejo)
 - [The Report [email std]](https://docs.google.com/document/d/1xJo6XP-dgRZwX9_Br58DGvOrsi-no30qGedizIJ4ENg/edit?usp=sharing)
+- [Video (bonus)](https://youtu.be/8dTMAh2FVZI?si=N8WVxJRcijh30NdR)
