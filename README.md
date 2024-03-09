@@ -20,6 +20,7 @@
 * [Links](#links)
 
 
+
 ## General Information
 Dalam permainan _Diamonds_, tujuan utama dari bot adalah mendapatkan poin sebanyak-banyaknya dan mendapatkan poin lebih banyak dibandingkan dengan bot kompetitor lainnya. Untuk mencapai hal tersebut, terdapat beberapa alternatif aksi yang dapat dilakukan. Contohnya, bot dapat mengambil diamonds lalu menyimpannya di base. Dapat juga dengan melakukan tackle pada bot kompetitor yang sedang membawa banyak diamonds lalu menyimpannya di base. Bisa juga dengan menggunakan portal untuk mempersingkat jarak tempuh menuju diamonds ataupun base. Beberapa aksi tersebut dan komponen lain dapat dijadikan sebagai dasar pemetaan persoalan untuk mencapai tujuan dengan menggunakan algoritma _greedy_. Pada tugas besar pertama Strategi Algoritma, kami diminta untuk membuat sebuah bot dengan algoritma _greedy_ yang nantinya akan dipertandingkan satu sama lain.
 
